@@ -34,6 +34,8 @@ abstract class BookScreenState<T extends BookScreen,
     PubController extends PublicationController> extends State<T> {
   late PubController publicationController;
   late ReaderContext readerContext;
+  double _dragStartY = 0;
+  static const double _dragThreshold = 50.0;
 
   ReaderAnnotationRepository get readerAnnotationRepository =>
       widget.readerAnnotationRepository ?? InMemoryReaderAnnotationRepository();
@@ -126,8 +128,21 @@ abstract class BookScreenState<T extends BookScreen,
       Stack(
         children: <Widget>[
           buildBackground(),
-          SafeArea(
-            child: child,
+          GestureDetector(
+            onVerticalDragStart: (details) {
+              _dragStartY = details.globalPosition.dy;
+            },
+            onVerticalDragUpdate: (details) {
+              double dragDistance = _dragStartY - details.globalPosition.dy;
+              if (dragDistance > _dragThreshold && !readerContext.toolbarVisibility) {
+                readerContext.onTap();
+              } else if (dragDistance < -_dragThreshold && readerContext.toolbarVisibility) {
+                readerContext.onTap();
+              }
+            },
+            child: SafeArea(
+              child: child,
+            ),
           ),
           Align(
             alignment: Alignment.bottomCenter,
