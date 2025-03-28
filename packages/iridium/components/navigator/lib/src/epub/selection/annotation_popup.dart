@@ -28,10 +28,21 @@ class AnnotationPopup extends StatefulWidget {
     String? annotation,
     String? highlightId,
   ) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AnnotationPopup(
-          selectionListener, selection, style, tint, annotation, highlightId),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: AnnotationPopup(
+          selectionListener,
+          selection,
+          style,
+          tint,
+          annotation,
+          highlightId,
+        ),
+      ),
     );
   }
 
@@ -40,72 +51,95 @@ class AnnotationPopup extends StatefulWidget {
 }
 
 class AnnotationPopupState extends State<AnnotationPopup> {
-  static const double borderWidth = 4.0;
   late TextEditingController _controller;
+  final FocusNode _focusNode = FocusNode();
 
   SelectionListener get selectionListener => widget.selectionListener;
-
   Selection get selection => widget.selection;
-
   HighlightStyle get style => widget.style;
-
   Color get tint => widget.tint;
-
   String? get annotation => widget.annotation;
-
   String? get highlightId => widget.highlightId;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: annotation);
+    // 自动获取焦点
+    Future.delayed(Duration(milliseconds: 100), () {
+      _focusNode.requestFocus();
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-        title: Text("Note"),
-        content: Column(
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(2)),
+        ),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                border: Border(
-                  left: BorderSide(color: tint, width: borderWidth),
-                ),
+              padding: EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    child: Image.asset(
+                      'assets/icons/note-left.png',
+                      width: 24,
+                      height: 24,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Add annotations with explanations...',
+                        hintStyle: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 16,
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                      maxLines: null,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        saveHighlight(value);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    icon: Image.asset(
+                      'assets/icons/note-send.png',
+                      width: 24,
+                      height: 24,
+                    ),
+                    onPressed: () {
+                      saveHighlight(_controller.text);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: borderWidth),
-                child: Text(selection.locator.text.highlight ?? ""),
-              ),
-            ),
-            TextField(
-              controller: _controller,
-              onSubmitted: (value) => saveHighlight(value),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () {
-              saveHighlight(_controller.text);
-              Navigator.pop(context);
-            },
-            child: Text("Save"),
-          ),
-        ],
       );
 
   void saveHighlight(String text) {

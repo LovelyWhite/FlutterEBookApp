@@ -5,17 +5,17 @@ import 'package:mno_navigator/src/epub/selection/selection_popup.dart';
 
 class HighlightPopup extends SelectionPopup {
   static const List<Color> highlightTints = [
-    Color.fromARGB(255, 249, 239, 125),
-    Color.fromARGB(255, 173, 247, 123),
-    Color.fromARGB(255, 124, 198, 247),
-    Color.fromARGB(255, 247, 124, 124),
-    Color.fromARGB(255, 182, 153, 255),
+    Color.fromARGB(255, 255, 192, 203), // pink
+    Color.fromARGB(255, 187, 173, 255), // purple
+    Color.fromARGB(255, 135, 206, 250), // blue
+    Color.fromARGB(255, 144, 238, 144), // green
+    Color.fromARGB(255, 255, 218, 185), // peach
   ];
 
   HighlightPopup(super.selectionListener);
 
   @override
-  double get optionsWidth => 360.0;
+  double get optionsWidth => 320.0;
 
   @override
   double get optionsHeight => 48.0;
@@ -29,28 +29,31 @@ class HighlightPopup extends SelectionPopup {
   ) {
     displayPopup(context, selection,
         child: Material(
-          type: MaterialType.canvas,
-          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          color: Color(0xFF3B3B3B),
+          borderRadius: BorderRadius.all(Radius.circular(24.0)),
           elevation: 8.0,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ...highlightTints
-                  .map((color) => buildColorOption(color, () {
-                        if (highlightId != null) {
-                          selectionListener.updateHighlight(
-                              selection, style, color, highlightId);
-                        } else {
-                          selectionListener.createHighlight(
-                              selection, style, color);
-                        }
-                        close();
-                      }))
-                  .toList(),
-              buildNoteOption(context, selection, highlightId),
-              if (highlightId != null) buildDeleteOption(context, highlightId),
-            ],
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ...highlightTints
+                    .map((color) => buildColorOption(color, () {
+                          if (highlightId != null) {
+                            selectionListener.updateHighlight(
+                                selection, style, color, highlightId);
+                          } else {
+                            selectionListener.createHighlight(
+                                selection, style, color);
+                          }
+                          close();
+                        }))
+                    .toList(),
+                buildNoteOption(context, selection, highlightId),
+                if (highlightId != null) buildDeleteOption(context, highlightId),
+              ],
+            ),
           ),
         ));
   }
@@ -60,11 +63,12 @@ class HighlightPopup extends SelectionPopup {
         constraints: BoxConstraints(minWidth: 40, minHeight: 40),
         onPressed: action,
         icon: Container(
-          width: 24,
-          height: 24,
+          width: 32,
+          height: 32,
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
+            border: Border.all(color: Colors.white.withOpacity(0.2), width: 2),
           ),
         ),
       );
@@ -81,7 +85,7 @@ class HighlightPopup extends SelectionPopup {
         },
         icon: Icon(
           Icons.edit,
-          color: Colors.blue.shade800,
+          color: Colors.white,
           size: 24,
         ),
       );
@@ -96,7 +100,7 @@ class HighlightPopup extends SelectionPopup {
         },
         icon: Icon(
           Icons.close,
-          color: Colors.red.shade700,
+          color: Colors.white,
           size: 24,
         ),
       );

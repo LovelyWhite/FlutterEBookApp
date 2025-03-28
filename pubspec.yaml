@@ -54,5 +54,6 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/icons/
     - assets/images/
     - assets/G.O.A.T Tradie - BusinessSight.epub

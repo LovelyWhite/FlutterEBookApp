@@ -11,37 +11,94 @@ class NewSelectionPopup extends SelectionPopup {
   double get optionsWidth => 300.0;
 
   @override
-  double get optionsHeight => 48.0;
+  double get optionsHeight => 64.0;
 
   void displaySelectionPopup(BuildContext context, Selection selection) {
     displayPopup(context, selection,
         child: Material(
-          type: MaterialType.canvas,
-          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          color: const Color(0xFF3B3B3B),
+          borderRadius: BorderRadius.circular(8.0),
           elevation: 8.0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              buildOption("Highlight", () {
-                selectionListener.showHighlightPopup(selection,
-                    HighlightStyle.highlight, HighlightPopup.highlightTints[0]);
-              }),
-              buildOption("Underline", () {
-                selectionListener.showHighlightPopup(selection,
-                    HighlightStyle.underline, HighlightPopup.highlightTints[0]);
-              }),
-              buildOption("Note", () {
-                selectionListener.showAnnotationPopup(selection,
-                    style: HighlightStyle.highlight,
-                    tint: HighlightPopup.highlightTints[0]);
-              }),
-            ],
+          child: SizedBox(
+            height: 64,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildOption(
+                  "Copy",
+                  Icons.copy_outlined,
+                  () {
+                    // TODO: 实现复制功能
+                  },
+                ),
+                _buildDivider(),
+                _buildOption(
+                  "Underline",
+                  Icons.format_underlined,
+                  () {
+                    selectionListener.showHighlightPopup(selection,
+                        HighlightStyle.underline, HighlightPopup.highlightTints[0]);
+                  },
+                ),
+                _buildDivider(),
+                _buildOption(
+                  "Highlight",
+                  Icons.brush_outlined,
+                  () {
+                    selectionListener.showHighlightPopup(selection,
+                        HighlightStyle.highlight, HighlightPopup.highlightTints[0]);
+                  },
+                ),
+                _buildDivider(),
+                _buildOption(
+                  "Note",
+                  Icons.mode_comment_outlined,
+                  () {
+                    selectionListener.showAnnotationPopup(selection,
+                        style: HighlightStyle.highlight,
+                        tint: HighlightPopup.highlightTints[0]);
+                  },
+                ),
+              ],
+            ),
           ),
         ));
   }
 
-  Widget buildOption(String text, VoidCallback action) => TextButton(
-        onPressed: action,
-        child: Text(text),
-      );
+  Widget _buildOption(String text, IconData icon, VoidCallback action) {
+    return InkWell(
+      onTap: action,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      width: 1,
+      height: 24,
+      color: Colors.white.withOpacity(0.2),
+    );
+  }
 }
