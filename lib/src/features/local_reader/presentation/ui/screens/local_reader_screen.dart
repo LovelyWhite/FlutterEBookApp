@@ -86,7 +86,7 @@ class _LocalReaderScreenState extends State<LocalReaderScreen> {
     // Display the EpubScreen with SQLite storage
     if (_filePath != null) {
       return FutureBuilder<EpubScreen>(
-        future: EpubScreen.fromPathWithSqliteStorage(filePath: _filePath!),
+        future: EpubScreen.fromPathWithFirestoreStorage(filePath: _filePath!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(

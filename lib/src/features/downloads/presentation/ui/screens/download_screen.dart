@@ -49,7 +49,7 @@ class DownloadsScreen extends ConsumerWidget {
                         final path = book['path'] as String;
                         final bookFile = File(path);
                         if (bookFile.existsSync()) {
-                          final epubScreen = await EpubScreen.fromPathWithSqliteStorage(
+                          final epubScreen = await EpubScreen.fromPathWithFirestoreStorage(
                             filePath: path,
                           );
                           if (context.mounted) {

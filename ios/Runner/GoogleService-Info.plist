@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>534706442874-odql3jo8oqqf2acmdip3ipldn940booq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.534706442874-odql3jo8oqqf2acmdip3ipldn940booq</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>534706442874-983jhub4rl9gf4etmdao8h5qblpvvij8.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDoXIADMUHWG2QDWoDO5i9Adq4m727ExRk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>534706442874</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>dev.jideguru.flutterEbookApp234</string>
+	<key>PROJECT_ID</key>
+	<string>the-trades-builders-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>the-trades-builders-app.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:534706442874:ios:e7c69cb8feaef278f321c3</string>
+	<key>DATABASE_URL</key>
+	<string>https://the-trades-builders-app-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

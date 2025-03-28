@@ -1,0 +1,24 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // accounts 
+    match /accounts/{accountId} {
+      allow read, write: if request.auth != null && request.auth.uid == accountId;
+    }
+
+    // users 
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId && request.resource.data.phoneNumber != null;
+    }
+
+    // reader annotations
+    match /reader_annotations/{collection}/{document=**} {
+      allow read, write: if true;
+    }
+
+    // other
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

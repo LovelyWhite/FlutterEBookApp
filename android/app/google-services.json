@@ -1,0 +1,179 @@
+{
+  "project_info": {
+    "project_number": "534706442874",
+    "firebase_url": "https://the-trades-builders-app-default-rtdb.firebaseio.com",
+    "project_id": "the-trades-builders-app",
+    "storage_bucket": "the-trades-builders-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534706442874:android:fe5f396340f128ebf321c3",
+        "android_client_info": {
+          "package_name": "com.example.trades_and_builders_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534706442874-983jhub4rl9gf4etmdao8h5qblpvvij8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trades_and_builders_app",
+            "certificate_hash": "bcab5cdbe9e7885209cd7d795b1b92a4df3b9b8a"
+          }
+        },
+        {
+          "client_id": "534706442874-ovh9qav1ap45ralf01n1fub2rrq2nvq5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaM3er8TQ6FhKADfYzDFk3qWKKwusvseY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534706442874-ovh9qav1ap45ralf01n1fub2rrq2nvq5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "534706442874-o1hlh04c4c8tg05au9ir7f9fcu0l08p7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tradesAndBuildersApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534706442874:android:ffeac97512ecfcbbf321c3",
+        "android_client_info": {
+          "package_name": "com.g.o.a.t.tradie.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534706442874-qfqr77nolii8dfvs8dhr9cgh8nasei4r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.g.o.a.t.tradie.app",
+            "certificate_hash": "f796e1423797b6fa555060ac2c7e7638a818d600"
+          }
+        },
+        {
+          "client_id": "534706442874-ovh9qav1ap45ralf01n1fub2rrq2nvq5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaM3er8TQ6FhKADfYzDFk3qWKKwusvseY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534706442874-ovh9qav1ap45ralf01n1fub2rrq2nvq5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "534706442874-o1hlh04c4c8tg05au9ir7f9fcu0l08p7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tradesAndBuildersApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534706442874:android:42d80ad748364a9ef321c3",
+        "android_client_info": {
+          "package_name": "com.goat.tradie.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534706442874-mrmi50s2e8aep8o2h6ffj97msn39s71b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.goat.tradie.app",
+            "certificate_hash": "4bc96248a540e76d2565fb5d9bd295fd3070b3a6"
+          }
+        },
+        {
+          "client_id": "534706442874-ovh9qav1ap45ralf01n1fub2rrq2nvq5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaM3er8TQ6FhKADfYzDFk3qWKKwusvseY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534706442874-ovh9qav1ap45ralf01n1fub2rrq2nvq5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "534706442874-o1hlh04c4c8tg05au9ir7f9fcu0l08p7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tradesAndBuildersApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534706442874:android:09fd7af7281b5a17f321c3",
+        "android_client_info": {
+          "package_name": "dev.jideguru.flutter_ebook_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534706442874-ovh9qav1ap45ralf01n1fub2rrq2nvq5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaM3er8TQ6FhKADfYzDFk3qWKKwusvseY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534706442874-ovh9qav1ap45ralf01n1fub2rrq2nvq5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "534706442874-o1hlh04c4c8tg05au9ir7f9fcu0l08p7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tradesAndBuildersApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

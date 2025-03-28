@@ -17,6 +17,8 @@ import 'package:mno_server/mno_server.dart';
 import 'package:mno_shared/mediatype.dart';
 import 'package:mno_shared/publication.dart';
 import 'package:mno_streamer/parser.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EpubScreen extends BookScreen {
   final String? location;
@@ -126,6 +128,43 @@ class EpubScreen extends BookScreen {
     
     // Create SQLite repository for this book
     final repository = await SqliteReaderAnnotationRepository.create(bookId);
+    
+    Map<String, dynamic>? decodedTheme;
+    try {
+      decodedTheme = json.decode(theme!);
+    } catch (e) {
+      debugPrint('failure to decode theme: $e');
+    }
+    
+    return EpubScreen(
+      key: key,
+      asset: FileAsset(File(filePath)),
+      readerAnnotationRepository: repository,
+      paginationCallback: paginationCallback,
+      location: location,
+      settings: int.tryParse(settings ?? '100'),
+      theme: decodedTheme,
+    );
+  }
+
+  /// Creates an EpubScreen with Firestore storage for annotations and bookmarks
+  static Future<EpubScreen> fromPathWithFirestoreStorage({
+    Key? key,
+    required String filePath,
+    PaginationCallback? paginationCallback,
+    String? location,
+    String? settings,
+    String? theme,
+  }) async {
+    // Extract book ID from file path
+    final fileName = filePath.split('/').last;
+    final bookId = fileName.replaceAll('.epub', '');
+    
+    // Get Firestore instance
+    final firestore = FirebaseFirestore.instance;
+    
+    // Create Firestore repository for this book
+    final repository = FirestoreReaderAnnotationRepository(bookId, firestore);
     
     Map<String, dynamic>? decodedTheme;
     try {
