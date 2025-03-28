@@ -128,8 +128,16 @@ class ReaderContext {
 
   Locator? get locator => location?.let((it) => Locator.fromJsonString(it));
 
-  int get currentPageNumber =>
-      publication!.paginationInfo[currentSpineItem]?.firstPageNumber ?? 1;
+  void checkPaginationInitialization() {
+    if (publication != null) {
+   
+    }
+  }
+
+  int get currentPageNumber {
+    var pageNumber = publication!.paginationInfo[currentSpineItem]?.firstPageNumber ?? 1;
+    return pageNumber;
+  }
 
   void dispose() {
     _toolbarStreamController.close();

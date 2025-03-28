@@ -34,8 +34,12 @@ class TocUtils {
     Map<Link, int> result = {};
     if (publication != null) {
       for (Link link in flattenedTableOfContents) {
-        int index = publication.readingOrder
-            .indexWhere((spineItem) => spineItem.href == link.hrefPart);
+        String linkHref = link.hrefPart;
+        
+        int index = publication.readingOrder.indexWhere((spineItem) {
+          String spineHref = spineItem.href;
+          return spineHref.endsWith(linkHref) || linkHref.endsWith(spineHref);
+        });
         result[link] = index;
       }
     }

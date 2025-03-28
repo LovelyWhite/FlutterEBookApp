@@ -21,7 +21,7 @@ class ContentPanelState extends State<ContentPanel> {
     // 初始化每个链接的展开状态
     _initExpandedState(widget.readerContext.tableOfContents);
   }
-  
+
   // 初始化展开状态，默认为展开的
   void _initExpandedState(List<Link> links) {
     for (var link in links) {
@@ -42,10 +42,77 @@ class ContentPanelState extends State<ContentPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: widget.readerContext.tableOfContents
-          .map((link) => _buildTocItem(context, link, 0))
-          .toList(),
+    return Container(
+      color: const Color(0xFFFAF8F8),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 16),
+            child: Container(
+              height: 35,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFEFEF),
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16),
+                    child: Icon(
+                      Icons.search,
+                      size: 20,
+                      color: Color(0xFF717171),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'search for chapters',
+                        hintStyle: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF717171),
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF717171),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 31,
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    margin: const EdgeInsets.only(right: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'table of contents',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF717171),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              children: widget.readerContext.tableOfContents
+                  .map((link) => _buildTocItem(context, link, 0))
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -54,70 +121,102 @@ class ContentPanelState extends State<ContentPanel> {
     bool isExpanded = _expandedState[link.href] ?? false;
     bool isClickable = !link.href.startsWith('#') || hasChildren;
 
+    String pageNumber = _getPageNumber(link);
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 当前目录项
         InkWell(
-          onTap: isClickable ? () {
-            if (hasChildren) {
-              _toggleExpanded(link.href);
-            } else if (!link.href.startsWith('#')) {
-              _onTap(link);
-            }
-          } : null,
+          onTap: isClickable
+              ? () {
+                  if (hasChildren) {
+                    _toggleExpanded(link.href);
+                  } else if (!link.href.startsWith('#')) {
+                    _onTap(link);
+                  }
+                }
+              : null,
           child: Container(
-            decoration: BoxDecoration(
-              color: level == 0 ? Colors.grey.withOpacity(0.1) : null,
-              border: level == 0 
-                  ? Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.3), width: 0.5))
-                  : null,
-            ),
             padding: EdgeInsets.only(
-              left: 16.0 + level * 16.0, // 根据层级缩进
-              right: 16.0,
-              top: 12.0,
-              bottom: 12.0,
+              left: 20.0 + level * 10.0,
+              right: 20.0,
+              top: 16.0,
+              bottom: 16.0,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF8F8),
+              border: Border(
+                bottom: BorderSide(
+                  color: const Color(0xFFEDEDED),
+                  width: 1.0,
+                ),
+              ),
             ),
             child: Row(
               children: [
-                if (hasChildren) 
-                  Icon(
-                    isExpanded ? Icons.arrow_drop_down : Icons.arrow_right,
-                    size: 20, 
-                    color: Colors.grey,
+                Text(
+                  link.title ?? "无标题",
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.4,
+                    color: const Color(0xFF717171),
+                    fontWeight:
+                        level == 0 ? FontWeight.w500 : FontWeight.normal,
+                    letterSpacing: -0.2,
                   ),
-                if (!hasChildren)
-                  SizedBox(width: 20), // 保持缩进一致
-                Expanded(
-                  child: Text(
-                    link.title ?? "无标题",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: level == 0 ? FontWeight.bold : FontWeight.normal,
-                      color: isClickable 
-                        ? (hasChildren ? Colors.black87 : Colors.blue)
-                        : Colors.black54,
-                    ),
+                ),
+                if (hasChildren) ...[
+                  Icon(
+                    isExpanded
+                        ? Icons.keyboard_arrow_down
+                        : Icons.keyboard_arrow_right,
+                    size: 18,
+                    color: const Color(0xFF717171),
+                  ),
+                ],
+                const Expanded(child: SizedBox()),
+                Text(
+                  pageNumber,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFFC0C2C4),
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
             ),
           ),
         ),
-        
-        // 子目录项，仅在展开状态显示
         if (hasChildren && isExpanded)
-          AnimatedContainer(
-            duration: Duration(milliseconds: 200),
-            child: Column(
-              children: link.children
-                  .map((child) => _buildTocItem(context, child, level + 1))
-                  .toList(),
-            ),
+          Column(
+            children: link.children
+                .map((child) => _buildTocItem(context, child, level + 1))
+                .toList(),
           ),
       ],
     );
+  }
+
+  String _getPageNumber(Link link) {
+    // 从 tableOfContentsToSpineItemIndex 获取 spine item 索引
+    int spineIndex =
+        widget.readerContext.tableOfContentsToSpineItemIndex[link] ?? -1;
+
+    if (spineIndex >= 0) {
+      // 获取对应的 spine item
+      Link? spineItem =
+          widget.readerContext.publication?.readingOrder[spineIndex];
+
+      if (spineItem != null) {
+        // 从 paginationInfo 获取页码信息
+        LinkPagination? pagination =
+            widget.readerContext.publication?.paginationInfo[spineItem];
+
+        if (pagination != null) {
+          return pagination.firstPageNumber.toString();
+        }
+      }
+    }
+    return "";
   }
 
   void _onTap(Link link) {

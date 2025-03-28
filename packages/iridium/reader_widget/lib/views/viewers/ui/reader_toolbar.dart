@@ -5,6 +5,7 @@ import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/reader_navigation_screen.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/toolbar_button.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/toolbar_page_number.dart';
+import 'package:iridium_reader_widget/views/viewers/ui/content_panel.dart';
 import 'package:mno_navigator/epub.dart';
 import 'package:mno_navigator/publication.dart';
 import 'package:iridium_reader_widget/util/router.dart';
@@ -40,6 +41,8 @@ class ReaderToolbarState extends State<ReaderToolbar> {
   @override
   void initState() {
     super.initState();
+    readerContext.checkPaginationInitialization();
+
     _toolbarStreamSubscription = readerContext.toolbarStream.listen((visible) {
       setState(() {
         opacity = (visible) ? 1.0 : 0.0;
@@ -89,9 +92,76 @@ class ReaderToolbarState extends State<ReaderToolbar> {
       icon: const Icon(Icons.menu),
       color: Colors.black54,
       onPressed: () {
-        // 显示章节目录
-        MyRouter.pushPage(
-            context, ReaderNavigationScreen(readerContext: readerContext));
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: const Color(0xFFFAF8F8),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.95,
+            child: Column(
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 30, bottom: 32),
+                        child: Center(
+                          child: Container(
+                            height: 4,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 20,
+                      top: 20,
+                      child: TextButton.icon(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 24,
+                          color: Color(0xFFC0C2C4),
+                        ),
+                        label: const Padding(
+                          padding: EdgeInsets.only(left: 4),
+                          child: Text(
+                            "Return to\nthe current",
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 1.2,
+                              color: Color(0xFFC0C2C4),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: ContentPanel(readerContext: readerContext),
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }
@@ -152,17 +222,23 @@ class ReaderToolbarState extends State<ReaderToolbar> {
     );
   }
 
-  Widget _builderCurrentPage() => StreamBuilder<int>(
-        initialData: 1,
-        stream: pageNumberController.stream,
-        builder: (context, snapshot) => ToolbarPageNumber(
+  Widget _builderCurrentPage() {
+    return StreamBuilder<int>(
+      initialData: 1,
+      stream: pageNumberController.stream,
+      builder: (context, snapshot) {
+        return ToolbarPageNumber(
           pageNumber: snapshot.data ?? 1,
-        ),
-      );
+        );
+      },
+    );
+  }
 
-  Widget _buildNbPages(BuildContext context) => ToolbarPageNumber(
-        pageNumber: readerContext.publication?.nbPages ?? 1,
-      );
+  Widget _buildNbPages(BuildContext context) {
+    return ToolbarPageNumber(
+      pageNumber: readerContext.publication?.nbPages ?? 1,
+    );
+  }
 
   Widget _buildSlider(BuildContext context) => Expanded(
         child: StreamBuilder<int>(

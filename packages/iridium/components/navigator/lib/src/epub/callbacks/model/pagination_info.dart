@@ -43,9 +43,11 @@ class PaginationInfo {
         (openPage.spineItemPageCount - 1);
   }
 
-  int get page =>
-      linkPagination.firstPageNumber +
-      percent * (linkPagination.pagesCount - 1) ~/ 100;
+  int get page {
+    int calculatedPage = linkPagination.firstPageNumber +
+        percent * (linkPagination.pagesCount - 1) ~/ 100;
+    return calculatedPage;
+  }
 
   static Location _locationFromJson(Map<String, dynamic> json) {
     Map<String, dynamic> locationJson = json["location"];
