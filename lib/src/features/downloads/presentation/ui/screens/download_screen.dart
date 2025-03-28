@@ -4,8 +4,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ebook_app/src/common/common.dart';
+import 'package:flutter_ebook_app/src/features/downloads/downloads.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iridium_reader_widget/iridium_reader_widget.dart';
 import 'package:iridium_reader_widget/views/viewers/epub_screen.dart';
 import 'package:uuid/uuid.dart';
 
@@ -47,14 +49,17 @@ class DownloadsScreen extends ConsumerWidget {
                         final path = book['path'] as String;
                         final bookFile = File(path);
                         if (bookFile.existsSync()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) {
-                                return EpubScreen.fromPath(filePath: path);
-                              },
-                            ),
+                          final epubScreen = await EpubScreen.fromPathWithSqliteStorage(
+                            filePath: path,
                           );
+                          if (context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => epubScreen,
+                              ),
+                            );
+                          }
                         } else {
                           context.showSnackBarUsingText(
                             'Could not find the book file. Please download it again.',

@@ -80,19 +80,43 @@ class NavigationDocumentParser {
     if (first == null) {
       return null; // should be <a>,  <span>, or <ol>
     }
-    String title = (first.name.local == "ol")
-        ? ""
-        : first.text.replaceAll(RegExp("\\s+"), " ").trim();
-    String? rawHref = first.getAttribute("href");
-    String href = (first.name.local == "a" && !rawHref.isNullOrBlank)
-        ? Href(rawHref!, baseHref: filePath).string
-        : "#";
-    List<Link> children = element
-            .getElement("ol", namespace: Namespaces.xhtml)
-            ?.let((it) => _parseOlElement(it, filePath)) ??
-        [];
+    
+    // 获取标题和链接
+    String title;
+    String href;
+    
+    if (first.name.local == "ol") {
+      // 特殊处理，这种情况可能是目录直接以ol开始，而不是先有链接
+      title = "";
+      href = "#";
+    } else {
+      // 正常情况，从a或span标签获取标题
+      title = first.text.replaceAll(RegExp("\\s+"), " ").trim();
+      String? rawHref = first.getAttribute("href");
+      href = (first.name.local == "a" && !rawHref.isNullOrBlank)
+          ? Href(rawHref!, baseHref: filePath).string
+          : "#";
+    }
+    
+    // 获取子元素
+    List<Link> children = [];
+    
+    // 1. 查找li内部的ol
+    XmlElement? childOl = element.getElement("ol", namespace: Namespaces.xhtml);
+    if (childOl != null) {
+      children = _parseOlElement(childOl, filePath);
+    }
+    
+    // 2. 如果没有找到内部ol，看看first元素是否包含ol (针对某些epub结构)
+    else if (first.name.local != "ol") {
+      childOl = first.getElement("ol", namespace: Namespaces.xhtml);
+      if (childOl != null) {
+        children = _parseOlElement(childOl, filePath);
+      }
+    }
 
-    if (children.isEmpty && (href == "#" || title == "")) {
+    // 只有当标题为空且href是#且没有子元素时，才返回null
+    if (title.isEmpty && href == "#" && children.isEmpty) {
       return null;
     } else {
       return Link(title: title, href: href, children: children);

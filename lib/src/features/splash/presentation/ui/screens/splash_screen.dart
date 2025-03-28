@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ebook_app/src/common/common.dart';
+import 'package:flutter_ebook_app/src/features/local_reader/presentation/ui/screens/local_reader_screen.dart';
 
 @RoutePage()
 class SplashScreen extends StatefulWidget {
@@ -22,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> changeScreen() async {
-    context.router.replace(const TabsRoute());
+    context.router.replaceNamed('/local-reader');
   }
 
   @override
@@ -34,14 +35,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffc81e23),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Image.asset(
-              'assets/images/app-icon.png',
-              height: 300.0,
-              width: 300.0,
+              'assets/images/splash.jpg',
+              fit: BoxFit.contain,
+              width: MediaQuery.of(context).size.width * 0.8,
             ),
           ],
         ),

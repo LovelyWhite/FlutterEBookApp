@@ -34,11 +34,12 @@ dependencies:
   shared_preferences: ^2.1.1
   uuid: ^4.2.2
   xml2json: ^5.3.1
+  file_picker: ^8.0.0+1
 
 dependency_overrides:
   collection: ^1.17.2
   flutter_inappwebview: ^5.8.0
-
+  watcher: ^1.1.0
 dev_dependencies:
   auto_route_generator: ^7.1.1
   build_runner: ^2.4.5
@@ -54,3 +55,4 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/G.O.A.T Tradie - BusinessSight.epub

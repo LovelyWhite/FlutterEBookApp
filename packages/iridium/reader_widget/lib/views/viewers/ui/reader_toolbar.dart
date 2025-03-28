@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
+import 'package:iridium_reader_widget/views/viewers/ui/reader_navigation_screen.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/toolbar_button.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/toolbar_page_number.dart';
 import 'package:mno_navigator/epub.dart';
 import 'package:mno_navigator/publication.dart';
+import 'package:iridium_reader_widget/util/router.dart';
 
 class ReaderToolbar extends StatefulWidget {
   final ReaderContext readerContext;
@@ -66,13 +68,65 @@ class ReaderToolbarState extends State<ReaderToolbar> {
             duration: const Duration(milliseconds: 300),
             child: Container(
               height: height,
-              color: Theme.of(context).colorScheme.primaryContainer,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: _firstRow(context),
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildChaptersButton(context),
+                  _buildSettingsButton(context),
+                  _buildFontButton(context),
+                  _buildSearchButton(context),
+                  _buildBrightnessButton(context),
+                ],
+              ),
             ),
           ),
         ),
       );
+
+  Widget _buildChaptersButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.menu),
+      color: Colors.black54,
+      onPressed: () {
+        // 显示章节目录
+        MyRouter.pushPage(
+            context, ReaderNavigationScreen(readerContext: readerContext));
+      },
+    );
+  }
+
+  Widget _buildSettingsButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.settings_outlined),
+      color: Colors.black54,
+      onPressed: () {},
+    );
+  }
+
+  Widget _buildFontButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.text_fields),
+      color: Colors.black54,
+      onPressed: () {},
+    );
+  }
+
+  Widget _buildSearchButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.search),
+      color: Colors.black54,
+      onPressed: () {},
+    );
+  }
+
+  Widget _buildBrightnessButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.brightness_6),
+      color: Colors.black54,
+      onPressed: () {},
+    );
+  }
 
   Widget _firstRow(BuildContext context) {
     var isReversed =
@@ -105,20 +159,6 @@ class ReaderToolbarState extends State<ReaderToolbar> {
           pageNumber: snapshot.data ?? 1,
         ),
       );
-  // Widget _builderCurrentPage() => StreamBuilder<int>(
-  //       initialData: 1,
-  //       stream: pageNumberController.stream,
-  //       builder: (context, snapshot) {
-  //         var isReversed =
-  //             readerContext.readingProgression?.isReverseOrder() ?? false;
-  //         var nbPages = readerContext.publication?.nbPages ?? 1;
-  //         var curPageNumber = snapshot.data ?? 1;
-  //         return ToolbarPageNumber(
-  //           pageNumber:
-  //               (isReversed ? nbPages - curPageNumber + 1 : curPageNumber),
-  //         );
-  //       },
-  //     );
 
   Widget _buildNbPages(BuildContext context) => ToolbarPageNumber(
         pageNumber: readerContext.publication?.nbPages ?? 1,
@@ -150,7 +190,6 @@ class ReaderToolbarState extends State<ReaderToolbar> {
                     inactiveTrackBar: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      //border: Border.all(width: 3, color: Colors.blue),
                     ),
                     activeTrackBar: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
@@ -164,17 +203,6 @@ class ReaderToolbarState extends State<ReaderToolbar> {
                       size: 24,
                     ),
                   ));
-              // return Slider(
-              //   onChanged: (value) => pageNumberController.add(value.toInt()),
-              //   onChangeEnd: (value) {
-              //     readerContext.execute(GoToPageCommand(value.toInt()));
-              //   },
-              //   min: 1.0,
-              //   max: readerContext.publication?.nbPages.toDouble() ?? 1,
-              //   value: snapshot.data?.toDouble() ?? 1,
-              //   activeColor: Theme.of(context).colorScheme.onPrimaryContainer,
-              //   inactiveColor: Theme.of(context).colorScheme.onPrimaryContainer,
-              // );
             }),
       );
 }

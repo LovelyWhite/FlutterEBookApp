@@ -6,3 +6,4 @@ export 'extensions/extensions.dart';
 export 'presentation/presentation.dart';
 export 'router/app_router.dart';
 export 'utils/utils.dart';
+export 'utils/asset_loader.dart';

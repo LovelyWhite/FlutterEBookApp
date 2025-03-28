@@ -38,6 +38,12 @@ abstract class SelectionPopup {
               children: [
                 GestureDetector(
                   onTap: close,
+                  behavior: HitTestBehavior.translucent,
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.transparent,
+                  ),
                 ),
                 if (rect != null)
                   Positioned.fromRect(

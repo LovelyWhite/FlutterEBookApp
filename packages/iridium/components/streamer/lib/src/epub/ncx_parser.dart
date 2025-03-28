@@ -46,10 +46,45 @@ class NcxParser {
   static Link? _parseNavPointElement(XmlElement element, String filePath) {
     String? title = _extractTitle(element);
     String? href = _extractHref(element, filePath);
-    List<Link> children = element
+    
+    // 增强子元素查找，有时候嵌套的navPoint可能有不同的结构
+    List<Link> children = [];
+    
+    // 直接子元素中的navPoint
+    var directChildren = element
         .findElements("navPoint", namespace: Namespaces.ncx)
         .mapNotNull((it) => _parseNavPointElement(it, filePath))
         .toList();
+    
+    if (directChildren.isNotEmpty) {
+      children.addAll(directChildren);
+    }
+    
+    // 有些EPUB会在navMap下使用navList来组织子菜单
+    var navList = element.getElement("navList", namespace: Namespaces.ncx);
+    if (navList != null) {
+      var navTargets = navList
+          .findElements("navTarget", namespace: Namespaces.ncx)
+          .mapNotNull((it) {
+            String? targetTitle = _extractTitle(it);
+            String? targetHref = _extractHref(it, filePath);
+            if (targetHref.isNullOrBlank || targetTitle.isNullOrBlank) {
+              return null;
+            }
+            return Link(title: targetTitle, href: targetHref!);
+          }).toList();
+      
+      if (navTargets.isNotEmpty) {
+        children.addAll(navTargets);
+      }
+    }
+    
+    // 针对只有标题没有href的情况，比如目录分组
+    if (href == null && title != null && children.isNotEmpty) {
+      return Link(title: title, href: "#", children: children);
+    }
+    
+    // 正常情况
     return (children.isEmpty && (href == null || title == null))
         ? null
         : Link(title: title, href: href ?? "#", children: children);

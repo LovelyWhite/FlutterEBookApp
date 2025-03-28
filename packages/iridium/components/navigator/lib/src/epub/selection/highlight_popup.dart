@@ -15,7 +15,7 @@ class HighlightPopup extends SelectionPopup {
   HighlightPopup(super.selectionListener);
 
   @override
-  double get optionsWidth => 300.0;
+  double get optionsWidth => 360.0;
 
   @override
   double get optionsHeight => 48.0;
@@ -33,6 +33,7 @@ class HighlightPopup extends SelectionPopup {
           borderRadius: BorderRadius.all(Radius.circular(8.0)),
           elevation: 8.0,
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ...highlightTints
@@ -55,8 +56,12 @@ class HighlightPopup extends SelectionPopup {
   }
 
   Widget buildColorOption(Color color, VoidCallback action) => IconButton(
+        padding: EdgeInsets.all(4.0),
+        constraints: BoxConstraints(minWidth: 40, minHeight: 40),
         onPressed: action,
         icon: Container(
+          width: 24,
+          height: 24,
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
@@ -67,6 +72,8 @@ class HighlightPopup extends SelectionPopup {
   Widget buildNoteOption(
           BuildContext context, Selection selection, String? highlightId) =>
       IconButton(
+        padding: EdgeInsets.all(4.0),
+        constraints: BoxConstraints(minWidth: 40, minHeight: 40),
         onPressed: () {
           selectionListener.showAnnotationPopup(selection,
               highlightId: highlightId);
@@ -74,19 +81,23 @@ class HighlightPopup extends SelectionPopup {
         },
         icon: Icon(
           Icons.edit,
-          color: Theme.of(context).primaryColor,
+          color: Colors.blue.shade800,
+          size: 24,
         ),
       );
 
   Widget buildDeleteOption(BuildContext context, String highlightId) =>
       IconButton(
+        padding: EdgeInsets.all(4.0),
+        constraints: BoxConstraints(minWidth: 40, minHeight: 40),
         onPressed: () {
           selectionListener.deleteHighlight(highlightId);
           close();
         },
         icon: Icon(
           Icons.close,
-          color: Theme.of(context).primaryColor,
+          color: Colors.red.shade700,
+          size: 24,
         ),
       );
 }

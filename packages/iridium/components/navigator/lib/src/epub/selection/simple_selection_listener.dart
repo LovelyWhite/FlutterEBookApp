@@ -17,6 +17,7 @@ class SimpleSelectionListener extends SelectionListener {
 
   @override
   void displayPopup(Selection selection) {
+    hidePopup();
     _newSelectionPopup = NewSelectionPopup(this);
     _newSelectionPopup!.displaySelectionPopup(context, selection);
   }

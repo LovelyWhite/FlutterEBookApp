@@ -106,6 +106,8 @@ class WebViewScreenState extends State<WebViewScreen> {
     selectionSubscription = selectionController.stream.listen((selection) {
       if (selection != null) {
         selectionListener.displayPopup(selection);
+      } else {
+        selectionListener.hidePopup();
       }
     });
     bookmarkSubscription = readerContext
@@ -222,6 +224,7 @@ class WebViewScreenState extends State<WebViewScreen> {
             },
             onHideContextMenu: () {
               selectionController.add(null);
+              selectionListener.hidePopup();
             },
           ),
           onWebViewCreated: _onWebViewCreated,

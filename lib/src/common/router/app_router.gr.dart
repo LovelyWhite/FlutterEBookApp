@@ -21,6 +21,12 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const TabsScreen(),
       );
     },
+    LocalReaderRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const LocalReaderScreen(),
+      );
+    },
     SettingsRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -162,6 +168,20 @@ class SplashRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'SplashRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [LocalReaderScreen]
+class LocalReaderRoute extends PageRouteInfo<void> {
+  const LocalReaderRoute({List<PageRouteInfo>? children})
+      : super(
+          LocalReaderRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'LocalReaderRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iridium_reader_widget/views/viewers/book_screen.dart';
 import 'package:iridium_reader_widget/views/viewers/model/fonts.dart';
+import 'package:mno_commons/extensions/uri.dart';
 import 'package:mno_commons/utils/functions.dart';
 import 'package:mno_navigator/epub.dart';
 import 'package:mno_navigator/publication.dart';
@@ -99,6 +101,43 @@ class EpubScreen extends BookScreen {
       key: key,
       asset: HttpAsset(rootHref, knownMediaType: mimeType),
       readerAnnotationRepository: readerAnnotationRepository,
+      paginationCallback: paginationCallback,
+      location: location,
+      settings: int.tryParse(settings ?? '100'),
+      theme: decodedTheme,
+    );
+  }
+
+  /// Creates an EpubScreen with SQLite storage for annotations and bookmarks
+  /// 
+  /// This factory method automatically creates and configures a SqliteReaderAnnotationRepository
+  /// for persistent storage of highlights, bookmarks, and reading positions.
+  static Future<EpubScreen> fromPathWithSqliteStorage({
+    Key? key,
+    required String filePath,
+    PaginationCallback? paginationCallback,
+    String? location,
+    String? settings,
+    String? theme,
+  }) async {
+    // Extract book ID from file path (just use filename as bookId)
+    final fileName = filePath.split('/').last;
+    final bookId = fileName.replaceAll('.epub', '');
+    
+    // Create SQLite repository for this book
+    final repository = await SqliteReaderAnnotationRepository.create(bookId);
+    
+    Map<String, dynamic>? decodedTheme;
+    try {
+      decodedTheme = json.decode(theme!);
+    } catch (e) {
+      debugPrint('failure to decode theme: $e');
+    }
+    
+    return EpubScreen(
+      key: key,
+      asset: FileAsset(File(filePath)),
+      readerAnnotationRepository: repository,
       paginationCallback: paginationCallback,
       location: location,
       settings: int.tryParse(settings ?? '100'),

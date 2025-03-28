@@ -14,6 +14,10 @@ class AppRouter extends _$AppRouter {
         page: SplashRoute.page,
         path: '/',
       ),
+      CupertinoRoute(
+        page: LocalReaderRoute.page,
+        path: '/local-reader',
+      ),
       CustomRoute(
         page: TabsRoute.page,
         path: '/tabs-screen',
