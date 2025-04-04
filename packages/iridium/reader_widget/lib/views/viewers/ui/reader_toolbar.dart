@@ -9,6 +9,7 @@ import 'package:iridium_reader_widget/views/viewers/ui/content_panel.dart';
 import 'package:mno_navigator/epub.dart';
 import 'package:mno_navigator/publication.dart';
 import 'package:iridium_reader_widget/util/router.dart';
+import 'package:iridium_reader_widget/views/viewers/ui/annotations_panel.dart';
 
 class ReaderToolbar extends StatefulWidget {
   final ReaderContext readerContext;
@@ -76,10 +77,10 @@ class ReaderToolbarState extends State<ReaderToolbar> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildChaptersButton(context),
-                  _buildSettingsButton(context),
-                  _buildFontButton(context),
-                  _buildSearchButton(context),
+                  _buildBookmarkButton(context),
+                  _buildProgressButton(context),
                   _buildBrightnessButton(context),
+                  _buildFontButton(context),
                 ],
               ),
             ),
@@ -89,7 +90,11 @@ class ReaderToolbarState extends State<ReaderToolbar> {
 
   Widget _buildChaptersButton(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.menu),
+      icon: Image.asset(
+        'assets/icons/chapters.png',
+        width: 18,
+        height: 18,
+      ),
       color: Colors.black54,
       onPressed: () {
         showModalBottomSheet(
@@ -136,7 +141,7 @@ class ReaderToolbarState extends State<ReaderToolbar> {
                         },
                         icon: const Icon(
                           Icons.keyboard_arrow_down,
-                          size: 24,
+                          size: 18,
                           color: Color(0xFFC0C2C4),
                         ),
                         label: const Padding(
@@ -166,25 +171,80 @@ class ReaderToolbarState extends State<ReaderToolbar> {
     );
   }
 
-  Widget _buildSettingsButton(BuildContext context) {
+  Widget _buildBookmarkButton(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.settings_outlined),
+      icon: Image.asset(
+        'assets/icons/bookmark.png',
+        width: 18,
+        height: 18,
+      ),
       color: Colors.black54,
-      onPressed: () {},
+      onPressed: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: const Color(0xFFFAF8F8),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.95,
+            child: Column(
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 30, bottom: 15),
+                        child: Center(
+                          child: Container(
+                            height: 4,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: AnnotationsPanel(
+                    readerContext: readerContext,
+                    annotationType: AnnotationType.bookmark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildFontButton(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.text_fields),
+      icon: Image.asset(
+        'assets/icons/fonts.png',
+        width: 18,
+        height: 18,
+      ),
       color: Colors.black54,
       onPressed: () {},
     );
   }
 
-  Widget _buildSearchButton(BuildContext context) {
+  Widget _buildProgressButton(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.search),
+      icon: Image.asset(
+        'assets/icons/progress.png',
+        width: 18,
+        height: 18,
+      ),
       color: Colors.black54,
       onPressed: () {},
     );
@@ -192,7 +252,11 @@ class ReaderToolbarState extends State<ReaderToolbar> {
 
   Widget _buildBrightnessButton(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.brightness_6),
+      icon: Image.asset(
+        'assets/icons/lightness.png',
+        width: 18,
+        height: 18,
+      ),
       color: Colors.black54,
       onPressed: () {},
     );
@@ -276,7 +340,7 @@ class ReaderToolbarState extends State<ReaderToolbar> {
                     child: Icon(
                       Icons.adjust,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      size: 24,
+                      size: 18,
                     ),
                   ));
             }),

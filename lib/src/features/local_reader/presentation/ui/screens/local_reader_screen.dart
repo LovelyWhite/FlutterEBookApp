@@ -57,7 +57,7 @@ class _LocalReaderScreenState extends State<LocalReaderScreen> {
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('eBook Reader'),
+          // title: const Text('eBook Reader'),
           centerTitle: true,
         ),
         body: const Center(
@@ -70,7 +70,7 @@ class _LocalReaderScreenState extends State<LocalReaderScreen> {
     if (_errorMessage.isNotEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('eBook Reader'),
+          // title: const Text('eBook Reader'),
           centerTitle: true,
         ),
         body: Center(

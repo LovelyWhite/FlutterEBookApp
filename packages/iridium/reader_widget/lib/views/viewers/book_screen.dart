@@ -134,9 +134,11 @@ abstract class BookScreenState<T extends BookScreen,
             },
             onVerticalDragUpdate: (details) {
               double dragDistance = _dragStartY - details.globalPosition.dy;
-              if (dragDistance > _dragThreshold && !readerContext.toolbarVisibility) {
+              if (dragDistance > _dragThreshold &&
+                  !readerContext.toolbarVisibility) {
                 readerContext.onTap();
-              } else if (dragDistance < -_dragThreshold && readerContext.toolbarVisibility) {
+              } else if (dragDistance < -_dragThreshold &&
+                  readerContext.toolbarVisibility) {
                 readerContext.onTap();
               }
             },
@@ -159,6 +161,22 @@ abstract class BookScreenState<T extends BookScreen,
           //     child: ReaderAppBar(
           //       readerContext: readerContext,
           //       publicationController: publicationController,
+          //     ),
+          //   ),
+          // ),
+          // SafeArea(
+          //   child: Align(
+          //     alignment: Alignment.topRight,
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(8.0),
+          //       child: IconButton(
+          //         icon: Image.asset(
+          //           'assets/icons/add-bookmark.png',
+          //           width: 24,
+          //           height: 24,
+          //         ),
+          //         onPressed: () => readerContext.toggleBookmark(),
+          //       ),
           //     ),
           //   ),
           // ),
