@@ -23,19 +23,6 @@ class BookListItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       onTap: () {
-        final bool isHomeTab = ref.read(currentTabNotifierProvider).isHomeTab;
-        final route = BookDetailsRoute(
-          entry: entry,
-          imgTag: imgTag,
-          titleTag: titleTag,
-          authorTag: authorTag,
-        );
-
-        if (context.isLargeScreen && isHomeTab) {
-          context.router.replace(route);
-        } else {
-          context.router.push(route);
-        }
       },
       child: SizedBox(
         height: 150.0,

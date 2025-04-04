@@ -29,19 +29,6 @@ class BookItem extends ConsumerWidget {
       width: 150,
       child: InkWell(
         onTap: () {
-          final bool isHomeTab = ref.read(currentTabNotifierProvider).isHomeTab;
-          final route = BookDetailsRoute(
-            entry: entry,
-            imgTag: imgTag,
-            titleTag: titleTag,
-            authorTag: authorTag,
-          );
-
-          if (context.isLargeScreen && isHomeTab) {
-            context.router.replace(route);
-          } else {
-            context.router.push(route);
-          }
         },
         child: Column(
           children: <Widget>[

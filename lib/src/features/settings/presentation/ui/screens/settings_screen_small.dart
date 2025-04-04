@@ -19,16 +19,6 @@ class _SettingsScreenSmallState extends State<SettingsScreenSmall> {
     super.initState();
     items = [
       {
-        'icon': Feather.heart,
-        'title': 'Favorites',
-        'function': () => _pushPage(const FavoritesRoute()),
-      },
-      {
-        'icon': Feather.download,
-        'title': 'Downloads',
-        'function': () => _pushPage(const DownloadsRoute()),
-      },
-      {
         'icon': Feather.moon,
         'title': 'Dark Mode',
         'function': null,

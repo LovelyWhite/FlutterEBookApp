@@ -33,20 +33,6 @@ class BookCard extends ConsumerWidget {
         child: InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(10.0)),
           onTap: () {
-            final bool isHomeTab =
-                ref.read(currentTabNotifierProvider).isHomeTab;
-            final route = BookDetailsRoute(
-              entry: entry,
-              imgTag: imgTag,
-              titleTag: titleTag,
-              authorTag: authorTag,
-            );
-
-            if (context.isLargeScreen && isHomeTab) {
-              context.router.replace(route);
-            } else {
-              context.router.push(route);
-            }
           },
           child: ClipRRect(
             borderRadius: const BorderRadius.all(

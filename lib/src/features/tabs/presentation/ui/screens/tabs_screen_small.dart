@@ -11,8 +11,6 @@ class TabsScreenSmall extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return AutoTabsRouter(
       routes: const [
-        HomeRoute(),
-        ExploreRoute(),
         SettingsRoute(),
       ],
       transitionBuilder: (context, child, animation) => FadeTransition(
