@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/reader_navigation_screen.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/toolbar_button.dart';
@@ -12,6 +13,9 @@ import 'package:mno_navigator/publication.dart';
 import 'package:iridium_reader_widget/util/router.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/annotations_panel.dart';
 import 'dart:ui' as ui;
+import 'package:screen_brightness/screen_brightness.dart';
+import 'package:iridium_reader_widget/views/viewers/ui/settings/settings_panel.dart';
+import 'package:iridium_reader_widget/views/viewers/ui/settings/color_theme.dart';
 
 class ReaderToolbar extends StatefulWidget {
   final ReaderContext readerContext;
@@ -33,7 +37,18 @@ class ReaderToolbarState extends State<ReaderToolbar> {
   late StreamSubscription<bool> _toolbarStreamSubscription;
   late StreamSubscription<PaginationInfo> _currentLocationStreamSubscription;
   late StreamController<int> pageNumberController;
+  late StreamController<double> _brightnessController;
+  late List<bool> isSelected;
   double opacity = 0.0;
+  double _brightness = 0.0;
+  Color _backgroundColor = Colors.white;
+  final List<Color> _colorOptions = [
+    Colors.white,
+    const Color(0xFFF8F1E3), // Sepia
+    const Color(0xFF2B2B2B), // Dark
+    const Color(0xFF000000), // Black
+  ];
+  final GlobalKey _brightnessKey = GlobalKey();
 
   ReaderContext get readerContext => widget.readerContext;
 
@@ -44,6 +59,9 @@ class ReaderToolbarState extends State<ReaderToolbar> {
   @override
   void initState() {
     super.initState();
+    isSelected = [true, false, false];
+    _initBrightness();
+    _brightnessController = StreamController<double>.broadcast();
     readerContext.checkPaginationInitialization();
 
     _toolbarStreamSubscription = readerContext.toolbarStream.listen((visible) {
@@ -60,6 +78,7 @@ class ReaderToolbarState extends State<ReaderToolbar> {
 
   @override
   void dispose() {
+    _brightnessController.close();
     super.dispose();
     _toolbarStreamSubscription.cancel();
     _currentLocationStreamSubscription.cancel();
@@ -442,14 +461,225 @@ class ReaderToolbarState extends State<ReaderToolbar> {
 
   Widget _buildBrightnessButton(BuildContext context) {
     return IconButton(
+      key: _brightnessKey,
       icon: Image.asset(
         'assets/icons/lightness.png',
         width: 18,
         height: 18,
       ),
       color: Colors.black54,
-      onPressed: () {},
+      onPressed: () {
+        ViewerSettingsBloc viewerSettingsBloc = BlocProvider.of<ViewerSettingsBloc>(context);
+        ReaderThemeBloc readerThemeBloc = BlocProvider.of<ReaderThemeBloc>(context);
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: const Color(0xFFFAF8F8),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (modalContext) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: viewerSettingsBloc),
+              BlocProvider.value(value: readerThemeBloc),
+            ],
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 4,
+                    width: 40,
+                    margin: const EdgeInsets.only(bottom: 30),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  // Brightness Control
+                  Container(
+                    height: 44,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    child: StreamBuilder<double>(
+                      initialData: _brightness,
+                      stream: _brightnessController.stream,
+                      builder: (context, snapshot) {
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            // Calculate position for the handle
+                            final handlePosition = (constraints.maxWidth - 44) * (snapshot.data ?? 0);
+                            
+                            return GestureDetector(
+                              onHorizontalDragUpdate: (details) {
+                                final RenderBox box = context.findRenderObject() as RenderBox;
+                                final Offset localPosition = box.globalToLocal(details.globalPosition);
+                                final double progress = math.max(0, math.min(1, localPosition.dx / constraints.maxWidth));
+                                _setBrightness(progress);
+                              },
+                              onTapDown: (details) {
+                                final RenderBox box = context.findRenderObject() as RenderBox;
+                                final Offset localPosition = box.globalToLocal(details.globalPosition);
+                                final double progress = math.max(0, math.min(1, localPosition.dx / constraints.maxWidth));
+                                _setBrightness(progress);
+                              },
+                              child: Stack(
+                                children: [
+                                  // Background progress bar
+                                  Container(
+                                    width: constraints.maxWidth,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEEEEEE),
+                                      borderRadius: BorderRadius.circular(22),
+                                    ),
+                                  ),
+                                  // Progress fill
+                                  Container(
+                                    width: handlePosition + 22,
+                                    height: 44,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFC0C2C4),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(22),
+                                        bottomLeft: Radius.circular(22),
+                                      ),
+                                    ),
+                                  ),
+                                  // Draggable handle
+                                  Positioned(
+                                    left: handlePosition,
+                                    child: Container(
+                                      width: 44,
+                                      height: 44,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            offset: Offset(0, 2),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // Left icon
+                                  Positioned(
+                                    left: 10,
+                                    child: SizedBox(
+                                      height: 44,
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.brightness_low,
+                                          size: 16,
+                                          color: const Color(0xFF717171),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  // Color Theme Options
+                  BlocBuilder<ReaderThemeBloc, ReaderThemeState>(
+                    builder: (context, state) {
+                      // Update isSelected based on current theme state
+                      isSelected = ColorTheme.values.map((colorTheme) {
+                        if (colorTheme == ColorTheme.defaultColorTheme) {
+                          return state.readerTheme.backgroundColor == null;
+                        } else {
+                          return state.readerTheme.backgroundColor?.value == colorTheme.backgroundColor?.value;
+                        }
+                      }).toList();
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: ColorTheme.values.asMap().entries.map((entry) {
+                          final int index = entry.key;
+                          final ColorTheme colorTheme = entry.value;
+                          return GestureDetector(
+                            onTap: () {
+                              readerThemeBloc.add(ReaderThemeEvent(
+                                readerThemeBloc.currentTheme.copy()
+                                  ..textColor = colorTheme.textColor
+                                  ..backgroundColor = colorTheme.backgroundColor
+                              ));
+                              setState(() {
+                                for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
+                                  isSelected[buttonIndex] = buttonIndex == index;
+                                }
+                              });
+                            },
+                            child: Container(
+                              width: 70,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: colorTheme.backgroundColor ?? Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: isSelected[index] ? Colors.red : Colors.grey[300]!,
+                                  width: isSelected[index] ? 2 : 1,
+                                ),
+                              ),
+                              child: colorTheme == ColorTheme.nightColorTheme
+                                  ? const Center(
+                                      child: Icon(
+                                        Icons.nightlight_round,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  Future<void> _initBrightness() async {
+    try {
+      _brightness = await ScreenBrightness().current;
+      _brightnessController.add(_brightness);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> _setBrightness(double brightness) async {
+    try {
+      await ScreenBrightness().setScreenBrightness(brightness);
+      _brightnessController.add(brightness);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  void _setBackgroundColor(Color color) {
+    setState(() {
+      _backgroundColor = color;
+    });
+    // TODO: Implement actual background color change logic
   }
 
   Widget _firstRow(BuildContext context) {

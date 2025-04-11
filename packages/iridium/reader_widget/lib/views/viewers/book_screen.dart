@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dartx/dartx.dart';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/reader_app_bar.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/reader_toolbar.dart';
@@ -148,10 +149,20 @@ abstract class BookScreenState<T extends BookScreen,
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: ReaderToolbar(
-              readerContext: readerContext,
-              onSkipLeft: publicationController.onSkipLeft,
-              onSkipRight: publicationController.onSkipRight,
+            child: MultiBlocProvider(
+              providers: [
+                BlocProvider<ReaderThemeBloc>(
+                  create: (context) => ReaderThemeBloc(ReaderThemeConfig.defaultTheme),
+                ),
+                BlocProvider<ViewerSettingsBloc>(
+                  create: (context) => ViewerSettingsBloc(EpubReaderState(null, 100)),
+                ),
+              ],
+              child: ReaderToolbar(
+                readerContext: readerContext,
+                onSkipLeft: publicationController.onSkipLeft,
+                onSkipRight: publicationController.onSkipRight,
+              ),
             ),
           ),
           // SafeArea(
@@ -164,22 +175,7 @@ abstract class BookScreenState<T extends BookScreen,
           //     ),
           //   ),
           // ),
-          // SafeArea(
-          //   child: Align(
-          //     alignment: Alignment.topRight,
-          //     child: Padding(
-          //       padding: const EdgeInsets.all(8.0),
-          //       child: IconButton(
-          //         icon: Image.asset(
-          //           'assets/icons/add-bookmark.png',
-          //           width: 24,
-          //           height: 24,
-          //         ),
-          //         onPressed: () => readerContext.toggleBookmark(),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+     
         ],
       );
 
