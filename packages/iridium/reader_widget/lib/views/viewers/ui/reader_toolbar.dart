@@ -16,6 +16,7 @@ import 'dart:ui' as ui;
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/settings/settings_panel.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/settings/color_theme.dart';
+import 'package:iridium_reader_widget/views/viewers/ui/settings/settings_row.dart';
 
 class ReaderToolbar extends StatefulWidget {
   final ReaderContext readerContext;
@@ -255,7 +256,438 @@ class ReaderToolbarState extends State<ReaderToolbar> {
         height: 18,
       ),
       color: Colors.black54,
-      onPressed: () {},
+      onPressed: () {
+        ViewerSettingsBloc viewerSettingsBloc = BlocProvider.of<ViewerSettingsBloc>(context);
+        ReaderThemeBloc readerThemeBloc = BlocProvider.of<ReaderThemeBloc>(context);
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: const Color(0xFFFAF8F8),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (modalContext) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: viewerSettingsBloc),
+              BlocProvider.value(value: readerThemeBloc),
+            ],
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 4,
+                    width: 40,
+                    margin: const EdgeInsets.only(bottom: 30),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  BlocBuilder(
+                    bloc: readerThemeBloc,
+                    builder: (BuildContext context, ReaderThemeState state) => Column(
+                      children: [
+                        // Font Size
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(left: 10, bottom: 10),
+                                child: Text(
+                                  "Font Size",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF717171),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: BlocBuilder<ViewerSettingsBloc, ViewerSettingsState>(
+                                  builder: (context, state) {
+                                    final double progress = (state.viewerSettings.fontSize - ViewerSettings.minFontSize) / 
+                                        (ViewerSettings.maxFontSize - ViewerSettings.minFontSize);
+                                    
+                                    return LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        final handlePosition = (constraints.maxWidth - 44) * progress;
+                                        
+                                        return GestureDetector(
+                                          onHorizontalDragUpdate: (details) {
+                                            final RenderBox box = context.findRenderObject() as RenderBox;
+                                            final Offset localPosition = box.globalToLocal(details.globalPosition);
+                                            final double progress = math.max(0, math.min(1, localPosition.dx / constraints.maxWidth));
+                                            final int newFontSize = (ViewerSettings.minFontSize + 
+                                                (ViewerSettings.maxFontSize - ViewerSettings.minFontSize) * progress).round();
+                                            
+                                            // Compare with current font size to determine whether to increase or decrease
+                                            if (newFontSize > state.viewerSettings.fontSize) {
+                                              viewerSettingsBloc.add(IncrFontSizeEvent());
+                                            } else if (newFontSize < state.viewerSettings.fontSize) {
+                                              viewerSettingsBloc.add(DecrFontSizeEvent());
+                                            }
+                                          },
+                                          child: Stack(
+                                            children: [
+                                              // Background track
+                                              Container(
+                                                width: constraints.maxWidth,
+                                                height: 44,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFEEEEEE),
+                                                  borderRadius: BorderRadius.circular(22),
+                                                ),
+                                              ),
+                                              // Progress fill
+                                              Container(
+                                                width: handlePosition + 22,
+                                                height: 44,
+                                                decoration: const BoxDecoration(
+                                                  color: Color(0xFFC0C2C4),
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(22),
+                                                    bottomLeft: Radius.circular(22),
+                                                  ),
+                                                ),
+                                              ),
+                                              // Handle
+                                              Positioned(
+                                                left: handlePosition,
+                                                child: Container(
+                                                  width: 44,
+                                                  height: 44,
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.white,
+                                                    shape: BoxShape.circle,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black12,
+                                                        blurRadius: 4,
+                                                        offset: Offset(0, 2),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      "${(state.viewerSettings.fontSize * 16 / 100).round()}",
+                                                      style: const TextStyle(fontSize: 12),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              // Left and right icons
+                                              Positioned(
+                                                left: 10,
+                                                child: SizedBox(
+                                                  height: 44,
+                                                  child: Center(
+                                                    child: Text("A", 
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: const Color(0xFF717171),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                right: 10,
+                                                child: SizedBox(
+                                                  height: 44,
+                                                  child: Center(
+                                                    child: Text("A", 
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                        color: const Color(0xFF717171),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Margin
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(left: 10, bottom: 10),
+                                child: Text(
+                                  "Margin",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF717171),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    final currentMargin = state.readerTheme.textMargin ?? TextMargin.margin_1_0;
+                                    final progress = currentMargin.id / (TextMargin.values.length - 1);
+                                    final handlePosition = (constraints.maxWidth - 44) * progress;
+                                    
+                                    return GestureDetector(
+                                      onHorizontalDragUpdate: (details) {
+                                        final RenderBox box = context.findRenderObject() as RenderBox;
+                                        final Offset localPosition = box.globalToLocal(details.globalPosition);
+                                        final double progress = math.max(0, math.min(1, localPosition.dx / constraints.maxWidth));
+                                        final int index = (progress * (TextMargin.values.length - 1)).round();
+                                        final newMargin = TextMargin.values[index];
+                                        readerThemeBloc.add(ReaderThemeEvent(
+                                          state.readerTheme.copy(
+                                            textMargin: newMargin,
+                                            advanced: true,
+                                          ),
+                                        ));
+                                      },
+                                      child: Stack(
+                                        children: [
+                                          // Background track
+                                          Container(
+                                            width: constraints.maxWidth,
+                                            height: 44,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFEEEEEE),
+                                              borderRadius: BorderRadius.circular(22),
+                                            ),
+                                          ),
+                                          // Progress fill
+                                          Container(
+                                            width: handlePosition + 22,
+                                            height: 44,
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFFC0C2C4),
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(22),
+                                                bottomLeft: Radius.circular(22),
+                                              ),
+                                            ),
+                                          ),
+                                          // Handle
+                                          Positioned(
+                                            left: handlePosition,
+                                            child: Container(
+                                              width: 44,
+                                              height: 44,
+                                              decoration: const BoxDecoration(
+                                                color: Colors.white,
+                                                shape: BoxShape.circle,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black12,
+                                                    blurRadius: 4,
+                                                    offset: Offset(0, 2),
+                                                  )
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  "${currentMargin.value}",
+                                                  style: const TextStyle(fontSize: 12),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          // Left and right icons
+                                          Positioned(
+                                            left: 10,
+                                            child: SizedBox(
+                                              height: 44,
+                                              child: Center(
+                                                child: Text("small", 
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: const Color(0xFF717171),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 10,
+                                            child: SizedBox(
+                                              height: 44,
+                                              child: Center(
+                                                child: Text("big", 
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: const Color(0xFF717171),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Line Spacing
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(left: 10, bottom: 10),
+                                child: Text(
+                                  "Line Spacing",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF717171),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    final currentSpacing = state.readerTheme.lineHeight ?? LineHeight.factor_1_0;
+                                    final progress = currentSpacing.id / (LineHeight.values.length - 1);
+                                    final handlePosition = (constraints.maxWidth - 44) * progress;
+                                    
+                                    return GestureDetector(
+                                      onHorizontalDragUpdate: (details) {
+                                        final RenderBox box = context.findRenderObject() as RenderBox;
+                                        final Offset localPosition = box.globalToLocal(details.globalPosition);
+                                        final double progress = math.max(0, math.min(1, localPosition.dx / constraints.maxWidth));
+                                        final int index = (progress * (LineHeight.values.length - 1)).round();
+                                        final newSpacing = LineHeight.values[index];
+                                        readerThemeBloc.add(ReaderThemeEvent(
+                                          state.readerTheme.copy(
+                                            lineHeight: newSpacing,
+                                            advanced: true,
+                                          ),
+                                        ));
+                                      },
+                                      child: Stack(
+                                        children: [
+                                          // Background track
+                                          Container(
+                                            width: constraints.maxWidth,
+                                            height: 44,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFEEEEEE),
+                                              borderRadius: BorderRadius.circular(22),
+                                            ),
+                                          ),
+                                          // Progress fill
+                                          Container(
+                                            width: handlePosition + 22,
+                                            height: 44,
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFFC0C2C4),
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(22),
+                                                bottomLeft: Radius.circular(22),
+                                              ),
+                                            ),
+                                          ),
+                                          // Handle
+                                          Positioned(
+                                            left: handlePosition,
+                                            child: Container(
+                                              width: 44,
+                                              height: 44,
+                                              decoration: const BoxDecoration(
+                                                color: Colors.white,
+                                                shape: BoxShape.circle,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black12,
+                                                    blurRadius: 4,
+                                                    offset: Offset(0, 2),
+                                                  )
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  "${currentSpacing.value}",
+                                                  style: const TextStyle(fontSize: 12),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          // Left and right icons
+                                          Positioned(
+                                            left: 10,
+                                            child: SizedBox(
+                                              height: 44,
+                                              child: Center(
+                                                child: Text("compact", 
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: const Color(0xFF717171),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 10,
+                                            child: SizedBox(
+                                              height: 44,
+                                              child: Center(
+                                                child: Text("loose", 
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: const Color(0xFF717171),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
