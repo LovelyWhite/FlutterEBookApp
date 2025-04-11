@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
@@ -10,6 +11,7 @@ import 'package:mno_navigator/epub.dart';
 import 'package:mno_navigator/publication.dart';
 import 'package:iridium_reader_widget/util/router.dart';
 import 'package:iridium_reader_widget/views/viewers/ui/annotations_panel.dart';
+import 'dart:ui' as ui;
 
 class ReaderToolbar extends StatefulWidget {
   final ReaderContext readerContext;
@@ -246,7 +248,195 @@ class ReaderToolbarState extends State<ReaderToolbar> {
         height: 18,
       ),
       color: Colors.black54,
-      onPressed: () {},
+      onPressed: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: const Color(0xFFFAF8F8),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) => StreamBuilder<int>(
+            initialData: 1,
+            stream: pageNumberController.stream,
+            builder: (context, snapshot) {
+              final totalPages = readerContext.publication?.nbPages ?? 1;
+              final currentPage = snapshot.data ?? 1;
+              final percentComplete = ((currentPage / totalPages) * 100).toInt();
+              final remainingHours = ((totalPages - currentPage) / 20).round(); // Average reading speed of 20 pages per hour
+              
+              return Container(
+                padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      height: 4,
+                      width: 40,
+                      margin: const EdgeInsets.only(bottom: 30),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildProgressStat(
+                          '$percentComplete%',
+                          'Finish reading\nin about $remainingHours hours',
+                        ),
+                        Container(width: 1, height: 50, color: Colors.grey[300]),
+                        _buildProgressStat(
+                          '20min',
+                          'Reading time',
+                        ),
+                        Container(width: 1, height: 50, color: Colors.grey[300]),
+                        _buildProgressStat(
+                          '3',
+                          'Notes',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    // Interactive progress bar
+                    Container(
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Calculate position for the handle
+                          final handlePosition = (constraints.maxWidth - 44) * 
+                              math.min(1.0, math.max(0.0, (currentPage - 1) / (totalPages - 1)));
+                          
+                          // Track current drag position for handle
+                          int draggedPage = currentPage;
+                          
+                          return GestureDetector(
+                            onHorizontalDragUpdate: (details) {
+                              final RenderBox box = context.findRenderObject() as RenderBox;
+                              final Offset localPosition = box.globalToLocal(details.globalPosition);
+                              final double progress = math.max(0, math.min(1, localPosition.dx / constraints.maxWidth));
+                              draggedPage = math.max(1, math.min(
+                                totalPages, 
+                                (progress * totalPages).round()
+                              ));
+                              pageNumberController.add(draggedPage);
+                            },
+                            onHorizontalDragEnd: (details) {
+                              // Use the current page from the stream builder
+                              readerContext.execute(GoToPageCommand(currentPage));
+                            },
+                            onTapDown: (details) {
+                              final RenderBox box = context.findRenderObject() as RenderBox;
+                              final Offset localPosition = box.globalToLocal(details.globalPosition);
+                              final double progress = math.max(0, math.min(1, localPosition.dx / constraints.maxWidth));
+                              final int newPage = math.max(1, math.min(
+                                totalPages, 
+                                (progress * totalPages).round()
+                              ));
+                              pageNumberController.add(newPage);
+                              readerContext.execute(GoToPageCommand(newPage));
+                            },
+                            child: Stack(
+                              children: [
+                                // Background progress bar
+                                Container(
+                                  width: constraints.maxWidth,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEEEEEE),
+                                    borderRadius: BorderRadius.circular(22),
+                                  ),
+                                ),
+                                // Progress fill (already read portion)
+                                Container(
+                                  width: handlePosition + 22, // Add half of handle width
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFC0C2C4),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(22),
+                                      bottomLeft: Radius.circular(22),
+                                      // No radius on the right side
+                                    ),
+                                  ),
+                                ),
+                                // Draggable handle (circle)
+                                Positioned(
+                                  left: handlePosition,
+                                  child: Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 4,
+                                          offset: Offset(0, 2),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                // Left arrow
+                                Positioned(
+                                  left: 10,
+                                  child: SizedBox(
+                                    height: 44,
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.arrow_back_ios,
+                                        size: 16,
+                                        color: const Color(0xFF717171),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProgressStat(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[500],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
