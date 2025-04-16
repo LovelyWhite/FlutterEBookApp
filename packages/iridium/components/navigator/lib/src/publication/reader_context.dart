@@ -47,8 +47,14 @@ class ReaderContext {
   late Map<Link, int> _tableOfContentsToSpineItemIndex;
   late Map<Type, ReaderCommandProcessor> readerCommandProcessors;
   Link? currentSpineItem;
-  SpineItemContext? currentSpineItemContext;
+  SpineItemContext? _currentSpineItemContext;
   SelectionListenerFactory selectionListenerFactory;
+
+  SpineItemContext? get currentSpineItemContext => _currentSpineItemContext;
+
+  set currentSpineItemContext(SpineItemContext? value) {
+    _currentSpineItemContext = value;
+  }
 
   ReadingProgression? readingProgression;
 
@@ -178,6 +184,7 @@ class ReaderContext {
   }
 
   void notifyCurrentLocation(PaginationInfo paginationInfo, Link spineItem) {
+    print("[ReaderContext] Notifying current location for spine item: ${spineItem.href}");
     this.paginationInfo = paginationInfo;
     this.currentSpineItem = spineItem;
     _currentLocationController.add(paginationInfo);
@@ -186,11 +193,10 @@ class ReaderContext {
   /// Sends the given [ReaderCommand] on the command bus, to be executed by the
   /// relevant component.
   void execute(ReaderCommand command) {
-    // Fimber.d("command: $command");
+    print("[ReaderContext] Executing command: ${command.runtimeType}");
     _updateSpineItemIndexForCommand(command);
     _createOpenPageRequestForCommand(command);
     this.readerCommand = command;
-    // Fimber.d("readerCommand: $readerCommand");
     _commandsStreamController.add(command);
   }
 
@@ -201,9 +207,11 @@ class ReaderContext {
     if (readerCommandProcessor != null) {
       command.spineItemIndex =
           readerCommandProcessor.findSpineItemIndex(command, publication);
+      print("[ReaderContext] Updated spine item index: ${command.spineItemIndex}");
     }
     if (command.spineItemIndex != null && command.spineItemIndex! >= 0) {
       currentSpineItem = publication.pageLinks[command.spineItemIndex!];
+      print("[ReaderContext] Set current spine item: ${currentSpineItem?.href}");
     }
   }
 

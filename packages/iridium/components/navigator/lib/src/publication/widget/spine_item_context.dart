@@ -28,7 +28,7 @@ class SpineItemContext {
   final LinkPagination linkPagination;
   final StreamController<PaginationInfo> _paginationInfoStreamController;
   PaginationInfo? currentPaginationInfo;
-  JsApi? jsApi;
+  JsApi? _jsApi;
 
   SpineItemContext({
     required this.spineItemIndex,
@@ -36,6 +36,12 @@ class SpineItemContext {
     required this.linkPagination,
   })  : bookmarks = [],
         _paginationInfoStreamController = StreamController.broadcast();
+
+  JsApi? get jsApi => _jsApi;
+
+  set jsApi(JsApi? value) {
+    _jsApi = value;
+  }
 
   Publication get publication => readerContext.publication!;
 
@@ -55,7 +61,6 @@ class SpineItemContext {
 
   void notifyPaginationInfo(PaginationInfo paginationInfo) {
     currentPaginationInfo = paginationInfo;
-    // debugPrint('paginfo: ${currentPaginationInfo?.json}');
     if (!_paginationInfoStreamController.isClosed) {
       _paginationInfoStreamController.add(paginationInfo);
     }
@@ -63,7 +68,9 @@ class SpineItemContext {
 
   void onTap() => readerContext.onTap();
 
-  void dispose() => _paginationInfoStreamController.close();
+  void dispose() {
+    _paginationInfoStreamController.close();
+  }
 
   Set<int> getBookmarkIndexes(int nbColumns) {
     Set<int> bookmarkIndexes = {};
