@@ -33,7 +33,7 @@ dependencies:
 
 dependency_overrides:
   intl: ^0.18.1
-  collection: ^1.17.2
+  collection: 1.17.2
 
 dev_dependencies:
   test: ^1.24.3
