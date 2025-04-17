@@ -35,8 +35,6 @@ abstract class BookScreenState<T extends BookScreen,
     PubController extends PublicationController> extends State<T> {
   late PubController publicationController;
   late ReaderContext readerContext;
-  double _dragStartY = 0;
-  static const double _dragThreshold = 50.0;
 
   ReaderAnnotationRepository get readerAnnotationRepository =>
       widget.readerAnnotationRepository ?? InMemoryReaderAnnotationRepository();
@@ -129,33 +127,16 @@ abstract class BookScreenState<T extends BookScreen,
       Stack(
         children: <Widget>[
           buildBackground(),
-          GestureDetector(
-            onVerticalDragStart: (details) {
-              _dragStartY = details.globalPosition.dy;
-            },
-            onVerticalDragUpdate: (details) {
-              double dragDistance = _dragStartY - details.globalPosition.dy;
-              if (dragDistance > _dragThreshold &&
-                  !readerContext.toolbarVisibility) {
-                readerContext.onTap();
-              } else if (dragDistance < -_dragThreshold &&
-                  readerContext.toolbarVisibility) {
-                readerContext.onTap();
-              }
-            },
-            child: SafeArea(
-              child: child,
-            ),
-          ),
+          child,
           Align(
             alignment: Alignment.bottomCenter,
             child: MultiBlocProvider(
               providers: [
                 BlocProvider<ReaderThemeBloc>(
-                  create: (context) => ReaderThemeBloc(ReaderThemeConfig.defaultTheme),
+                  create: (_) => BlocProvider.of<ReaderThemeBloc>(context),
                 ),
                 BlocProvider<ViewerSettingsBloc>(
-                  create: (context) => ViewerSettingsBloc(EpubReaderState(null, 100)),
+                  create: (_) => BlocProvider.of<ViewerSettingsBloc>(context),
                 ),
               ],
               child: ReaderToolbar(
@@ -165,16 +146,16 @@ abstract class BookScreenState<T extends BookScreen,
               ),
             ),
           ),
-          // SafeArea(
-          //   top: false,
-          //   child: Align(
-          //     alignment: Alignment.topCenter,
-          //     child: ReaderAppBar(
-          //       readerContext: readerContext,
-          //       publicationController: publicationController,
-          //     ),
-          //   ),
-          // ),
+          SafeArea(
+            top: false,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ReaderAppBar(
+                readerContext: readerContext,
+                publicationController: publicationController,
+              ),
+            ),
+          ),
      
         ],
       );
