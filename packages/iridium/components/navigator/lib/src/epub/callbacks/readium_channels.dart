@@ -83,16 +83,26 @@ class ReadiumChannels extends JavascriptChannels {
             _spineItemContext.spineItemIndex,
             locator,
             _spineItemContext.linkPagination);
+        
+        Fimber.d("Processing bookmark toggle for page ${paginationInfo.openPage.spineItemPageIndex}");
+        
         List<ReaderAnnotation> visibleBookmarks =
             _spineItemContext.getVisibleBookmarks(
                 paginationInfo.openPage.spineItemPageIndex,
                 paginationInfo.openPage.spineItemPageCount);
+        
+        Fimber.d("Found ${visibleBookmarks.length} visible bookmarks");
+        
         if (visibleBookmarks.isNotEmpty) {
-          _readerAnnotationRepository
-              ?.delete(visibleBookmarks.map((b) => b.id));
+          Fimber.d("Deleting bookmarks: ${visibleBookmarks.map((b) => b.id).join(', ')}");
+          _readerAnnotationRepository?.delete(visibleBookmarks.map((b) => b.id));
         } else {
+          Fimber.d("Creating new bookmark");
           _readerAnnotationRepository?.createBookmark(paginationInfo);
         }
+        
+        // Force update UI after toggle
+        _spineItemContext.notifyPaginationInfo(paginationInfo);
       } on Object catch (e, stacktrace) {
         Fimber.d("onToggleBookmark error: $e, $stacktrace",
             ex: e, stacktrace: stacktrace);
@@ -148,11 +158,11 @@ class ReadiumChannels extends JavascriptChannels {
   bool handleFootnote(String targetElement) => true;
 
   void _onSwipeUp(List<dynamic> arguments) {
-    viewerSettingsBloc?.add(IncrFontSizeEvent());
+    // viewerSettingsBloc?.add(IncrFontSizeEvent());
   }
 
   void _onSwipeDown(List<dynamic> arguments) {
-    viewerSettingsBloc?.add(DecrFontSizeEvent());
+    // viewerSettingsBloc?.add(DecrFontSizeEvent());
   }
 
   void _scrollRight(bool animated) {

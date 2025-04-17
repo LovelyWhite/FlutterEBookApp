@@ -146,16 +146,16 @@ abstract class BookScreenState<T extends BookScreen,
               ),
             ),
           ),
-          SafeArea(
-            top: false,
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: ReaderAppBar(
-                readerContext: readerContext,
-                publicationController: publicationController,
-              ),
-            ),
-          ),
+          // SafeArea(
+          //   top: false,
+          //   child: Align(
+          //     alignment: Alignment.topCenter,
+          //     child: ReaderAppBar(
+          //       readerContext: readerContext,
+          //       publicationController: publicationController,
+          //     ),
+          //   ),
+          // ),
      
         ],
       );
